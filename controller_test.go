@@ -24,7 +24,7 @@ type testController struct {
 	c *Controller
 
 	volUp, volDown, mute *fakePin
-	clk, dt, sw           *fakePin
+	clk, dt, sw          *fakePin
 
 	sleeps []time.Duration
 }

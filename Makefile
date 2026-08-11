@@ -1,8 +1,8 @@
 build:
-	tinygo build -target=pico -o bin/main.uf2 main.go
+	tinygo build -target=pico -o bin/main.uf2 .
 
 flash:
-	tinygo flash -target=pico main.go
+	tinygo flash -target=pico .
 
 test:
 	go test ./...
