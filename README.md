@@ -10,19 +10,64 @@ pressed.
 
 ## Hardware
 
-| Signal              | Pico pin |
-|---------------------|----------|
-| Volume Up (opto)    | GP16     |
-| Volume Down (opto)  | GP17     |
-| Mute (opto)         | GP21     |
-| Encoder CLK         | GP14     |
-| Encoder DT          | GP15     |
-| Encoder SW          | GP20     |
+| Signal        | Pico pin |
+| ------------- | -------- |
+| Vol + (opto)  | GP16     |
+| Vol - (opto)  | GP17     |
+| Mute (opto)   | GP21     |
+| Encoder CLK   | GP14     |
+| Encoder DT    | GP15     |
+| Encoder SW    | GP20     |
 
 The three optocoupler outputs are configured `PinOutput` and idle LOW; each
 is pulsed HIGH for 60ms to register as a button press on the head unit. The
 three encoder inputs are configured `PinInputPullup`, matching a standard
 KY-040 breakout (idle HIGH, active LOW).
+
+```mermaid
+flowchart LR
+    subgraph Encoder["KY-040 rotary encoder"]
+        CLK["CLK"]
+        DT["DT"]
+        SW["SW"]
+    end
+
+    subgraph Pico["Raspberry Pi Pico"]
+        GP14["GP14"]
+        GP15["GP15"]
+        GP20["GP20"]
+        GP16["GP16"]
+        GP17["GP17"]
+        GP21["GP21"]
+    end
+
+    subgraph Optos["PC817 optocouplers"]
+        OptoUp["opto: Vol +"]
+        OptoDown["opto: Vol -"]
+        OptoMute["opto: Mute"]
+    end
+
+    subgraph Ladder["Resistor ladder"]
+        R1["R1 15kΩ"]
+        R2["R2 24.2kΩ"]
+        R3["R3 3.3kΩ"]
+    end
+
+    HeadUnit["Pioneer head unit<br/>SWC signal line"]
+
+    CLK --> GP14
+    DT --> GP15
+    SW --> GP20
+
+    GP16 --> OptoUp --> R1 --> HeadUnit
+    GP17 --> OptoDown --> R2 --> HeadUnit
+    GP21 --> OptoMute --> R3 --> HeadUnit
+```
+
+Each optocoupler's phototransistor (output side) switches its resistor onto the
+head unit's single SWC signal line, so a press presents a specific resistance
+for the head unit to read: R1 15kΩ for Vol +, R2 24.2kΩ for Vol -, R3 3.3kΩ for
+Mute.
 
 ## Behavior
 
