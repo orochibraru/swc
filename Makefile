@@ -3,3 +3,6 @@ build:
 
 flash:
 	tinygo flash -target=pico main.go
+
+test:
+	go test ./...
